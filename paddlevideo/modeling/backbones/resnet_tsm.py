@@ -139,15 +139,8 @@ class BottleneckBlock(nn.Layer):
         self.num_seg = num_seg
 
     def forward(self, inputs):
-        if self.data_format == "NCHW":
-            shifts = F.temporal_shift(inputs, self.num_seg, 1.0 / self.num_seg)
-        elif self.data_format == "NHWC":
-            #N,H,W,C --> N,C,H,W
-            inputs_trans = paddle.transpose(inputs, perm=[0, 3, 1, 2])
-            shifts = F.temporal_shift(inputs_trans, self.num_seg,
-                                      1.0 / self.num_seg)
-            #N,C,H,W --> N,H,W,C
-            shifts = paddle.transpose(shifts, perm=[0, 2, 3, 1])
+        shifts = F.temporal_shift(inputs, self.num_seg,
+                                  1.0 / self.num_seg, data_format=self.data_format)
         y = self.conv0(shifts)
         conv1 = self.conv1(y)
         conv2 = self.conv2(conv1)

@@ -59,6 +59,7 @@ class TSMHead(TSNHead):
                                              regularizer=L2Decay(0.0)))
 
         self.stdv = std
+        self.data_format = data_format
 
     def init_weights(self):
         """Initiate the FC layer parameters"""
@@ -79,8 +80,8 @@ class TSMHead(TSNHead):
 
         if self.dropout is not None:
             x = self.dropout(x)  # [N * seg_num, in_channels, 1, 1]
-
-        x = paddle.reshape(x, x.shape[:2])  # [N * seg_num, in_channels]
+        shape = x.shape[:2] if self.data_format == "NCHW" else [x.shape[0], x.shape[3]]
+        x = paddle.reshape(x, shape=shape)  # [N * seg_num, in_channels]
         score = self.fc(x)  # [N * seg_num, num_class]
         score = paddle.reshape(
             score, [-1, seg_num, score.shape[1]])  # [N, seg_num, num_class]

@@ -131,7 +131,7 @@ def train_model(cfg,
             ###AMP###
             if amp:
                 with paddle.amp.auto_cast(
-                        custom_black_list={"temporal_shift", "reduce_mean"}):
+                        custom_black_list={"reduce_mean"}):
                     outputs = model(data, mode='train')
 
                 avg_loss = outputs['loss']
